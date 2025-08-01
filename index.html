@@ -5,12 +5,16 @@
   <title>I love you</title>
   <meta name="keywords" content="love code, HTML effect, heart rain">
   <meta name="description" content="Mưa chữ I LOVE U đẹp mắt bằng HTML Canvas">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
+      overflow: hidden; /* Chặn cuộn */
       background-color: black;
+      height: 100%;
+      width: 100%;
+      touch-action: none; /* Chặn thao tác cuộn tay trên mobile */
     }
 
     canvas {
@@ -25,33 +29,97 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 48px;
+      font-size: 64px;
       font-family: Arial, sans-serif;
-      color: #f584b7;
+      color: #ffffff;
       font-weight: bold;
-      text-shadow: 0 0 10px #f584b7, 0 0 20px #fff;
+      text-shadow: 0 0 15px #fff, 0 0 25px #f584b7;
       opacity: 0;
       transition: opacity 0.5s ease;
+      z-index: 2;
+    }
+
+    #finalImage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 80vw;
+      max-height: 80vh;
+      display: none;
+      border: 4px solid #f584b7;
+      border-radius: 16px;
+      box-shadow: 0 0 30px #f584b7;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    #rotateNotice {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: black;
+      color: white;
+      font-size: 28px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    #startButton {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px 40px;
+      font-size: 24px;
+      font-weight: bold;
+      background-color: #f584b7;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      z-index: 1001;
+      display: none;
+      box-shadow: 0 0 20px #f584b7;
     }
   </style>
 </head>
 <body>
   <canvas id="canvas"></canvas>
   <div id="centerText"></div>
+  <img id="finalImage" src="https://i.postimg.cc/htjC4jPQ/retouch-2025072222563509.jpg" alt="Final Image" />
+  <div id="rotateNotice">xoay ngang màn hình</div>
+  <button id="startButton">BẮT ĐẦU</button>
 
   <script>
-    // Hiệu ứng mưa chữ
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const centerText = document.getElementById('centerText');
+    const finalImage = document.getElementById('finalImage');
+    const rotateNotice = document.getElementById('rotateNotice');
+    const startButton = document.getElementById('startButton');
+
+    let started = false;
 
     const texts = 'I LOVE U'.split('');
     const fontSize = 16;
-    const columns = Math.floor(canvas.width / fontSize);
-    const drops = Array(columns).fill(1);
+    let columns = Math.floor(window.innerWidth / fontSize);
+    let drops = Array(columns).fill(1);
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     function draw() {
+      if (!started) return;
+
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -72,18 +140,27 @@
 
     setInterval(draw, 33);
 
-    window.addEventListener('resize', () => {
+    function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-    });
+      columns = Math.floor(canvas.width / fontSize);
+      drops = Array(columns).fill(1);
+      checkOrientation();
+    }
 
-    // Hiển thị chữ ở giữa
-    const centerText = document.getElementById('centerText');
-    const messages = ["3", "2", "1", "Happy Birthday", "Trong Nghĩa", "17/05/2009",];
+    window.addEventListener('resize', resizeCanvas);
+
+    const messages = ["3", "2", "1", "Happy Birthday", "Trong Nghĩa", "17/05/2009"];
     let index = 0;
 
     function showNextMessage() {
-      if (index >= messages.length) return;
+      if (index >= messages.length) {
+        finalImage.style.display = 'block';
+        setTimeout(() => {
+          finalImage.style.opacity = '1';
+        }, 50);
+        return;
+      }
 
       centerText.textContent = messages[index];
       centerText.style.opacity = '1';
@@ -91,12 +168,32 @@
       setTimeout(() => {
         centerText.style.opacity = '0';
         index++;
-        setTimeout(showNextMessage, 500); // đợi 0.5s trước khi hiện chữ tiếp theo
-      }, 2000); // mỗi dòng hiện 2s
+        setTimeout(showNextMessage, 500);
+      }, 2000);
     }
 
-    // Bắt đầu hiển thị sau 1 giây
-    setTimeout(showNextMessage, 1000);
+    function startShow() {
+      if (started) return;
+      started = true;
+      startButton.style.display = 'none';
+      showNextMessage();
+    }
+
+    startButton.addEventListener('click', startShow);
+
+    function checkOrientation() {
+      const isLandscape = window.innerWidth > window.innerHeight;
+
+      if (isLandscape) {
+        rotateNotice.style.display = 'none';
+        if (!started) startButton.style.display = 'block';
+      } else {
+        rotateNotice.style.display = 'flex';
+        startButton.style.display = 'none';
+      }
+    }
+
+    checkOrientation(); // Lần đầu
   </script>
 </body>
 </html>
