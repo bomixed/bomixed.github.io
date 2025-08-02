@@ -5,11 +5,13 @@
   <title>I love you</title>
   <meta name="keywords" content="love code, HTML effect, heart rain">
   <meta name="description" content="Mưa chữ I LOVE U đẹp mắt bằng HTML Canvas">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       overflow: hidden;
       background: black;
+      font-family: 'Poppins', sans-serif;
     }
 
     canvas {
@@ -21,11 +23,12 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 60px;
+      font-size: 8vw; /* phù hợp mọi kích thước màn hình */
       color: white;
-      font-family: 'monospace';
       opacity: 0;
       transition: opacity 0.5s ease;
+      text-align: center;
+      white-space: nowrap;
       pointer-events: none;
     }
   </style>
@@ -71,7 +74,7 @@
 
     setInterval(draw, 33);
 
-    // Phần hiện từng dòng chữ
+    // Hiện từng dòng chữ
     const messages = ["3", "2", "1", "happy birthday", "Trong Nghia", "17/05/2009"];
     const messageDiv = document.getElementById("message");
 
@@ -86,8 +89,8 @@
 
         setTimeout(() => {
           showMessages(index + 1);
-        }, 500); // chờ 0.5s sau khi ẩn để hiện cái mới
-      }, 2000); // hiện 2 giây
+        }, 500);
+      }, 2000);
     }
 
     // Bắt đầu sau 2 giây
